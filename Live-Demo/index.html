@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-section {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            color: white;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group input, .input-group select {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .balance-section {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .balance {
+            font-size: 2em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .table-section {
+            padding: 30px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+        }
+
+        .table th, .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .table th {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: scale(1.01);
+        }
+
+        .expense-row {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1));
+        }
+
+        .income-row {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.1));
+        }
+
+        .amount {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .expense-amount {
+            color: #e74c3c;
+        }
+
+        .income-amount {
+            color: #27ae60;
+        }
+
+        .type-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .expense-badge {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .income-badge {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .table-section {
+                overflow-x: auto;
+            }
+        }
+
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container floating-animation">
+        <div class="header">
+            <h1>💰 Expense Manager</h1>
+            <p>Track your income and expenses with style</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="description">Description</label>
+                <input type="text" id="description" placeholder="Enter description" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="amount">Amount (₹)</label>
+                <input type="number" id="amount" placeholder="0.00" step="0.01" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="type">Type</label>
+                <select id="type" required>
+                    <option value="Expense">Expense</option>
+                    <option value="Income">Income</option>
+                </select>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn btn-primary" onclick="addEntry()">Add Entry</button>
+                <button class="btn btn-success" onclick="saveToCSV()">Save CSV</button>
+            </div>
+        </div>
+
+        <div class="balance-section">
+            <div class="balance">Balance: ₹<span id="balanceAmount">0.00</span></div>
+        </div>
+
+        <div class="table-section">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody id="entriesTable">
+                    <!-- Entries will be added here dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let entries = [];
+        let balance = 0;
+
+        // Set today's date as default
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+        function addEntry() {
+            const date = document.getElementById('date').value;
+            const description = document.getElementById('description').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const type = document.getElementById('type').value;
+
+            if (!date || !description || isNaN(amount)) {
+                alert('Please fill in all fields with valid data');
+                return;
+            }
+
+            const entry = {
+                date: date,
+                description: description,
+                amount: amount,
+                type: type
+            };
+
+            entries.push(entry);
+            updateTable();
+            updateBalance();
+            clearForm();
+        }
+
+        function updateTable() {
+            const tableBody = document.getElementById('entriesTable');
+            tableBody.innerHTML = '';
+
+            entries.forEach(entry => {
+                const row = document.createElement('tr');
+                row.className = entry.type === 'Expense' ? 'expense-row' : 'income-row';
+
+                const displayAmount = entry.type === 'Expense' ? -Math.abs(entry.amount) : Math.abs(entry.amount);
+                const amountClass = entry.type === 'Expense' ? 'expense-amount' : 'income-amount';
+                const badgeClass = entry.type === 'Expense' ? 'expense-badge' : 'income-badge';
+
+                row.innerHTML = `
+                    <td>${entry.date}</td>
+                    <td>${entry.description}</td>
+                    <td class="amount ${amountClass}">₹${displayAmount.toFixed(2)}</td>
+                    <td><span class="type-badge ${badgeClass}">${entry.type}</span></td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function updateBalance() {
+            balance = 0;
+            entries.forEach(entry => {
+                if (entry.type === 'Income') {
+                    balance += entry.amount;
+                } else {
+                    balance -= entry.amount;
+                }
+            });
+
+            document.getElementById('balanceAmount').textContent = balance.toFixed(2);
+        }
+
+        function clearForm() {
+            document.getElementById('description').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('type').value = 'Expense';
+            // Keep date as current date
+        }
+
+        function saveToCSV() {
+            if (entries.length === 0) {
+                alert('No entries to save');
+                return;
+            }
+
+            let csvContent = 'Date,Description,Amount,Type\n';
+            
+            entries.forEach(entry => {
+                const displayAmount = entry.type === 'Expense' ? -Math.abs(entry.amount) : Math.abs(entry.amount);
+                csvContent += `${entry.date},${entry.description},${displayAmount.toFixed(2)},${entry.type}\n`;
+            });
+
+            csvContent += `Balance,,${balance.toFixed(2)},`;
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'expense_manager_' + new Date().toISOString().split('T')[0] + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
